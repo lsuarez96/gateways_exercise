@@ -16,6 +16,21 @@ public class DeviceService {
     @Autowired
     DeviceRepository deviceRepository;
 
+    public DeviceService() {
+    }
+
+    /**
+     * Parametrized constructor. Since this class utilizes field injection this constructor is only used for test
+     * proposes (is more convenient to create manually the instance than set up an entire spring context just
+     * to test
+     * this class)
+     *
+     * @param deviceRepository crud repository
+     */
+    public DeviceService(DeviceRepository deviceRepository) {
+        this.deviceRepository = deviceRepository;
+    }
+
     /**
      * List all Device records stored in the database.
      *
@@ -56,7 +71,7 @@ public class DeviceService {
      * Modifies the specified Device record.
      *
      * @param device Device information to perform the update.
-     * @param id specified Device record to be updated
+     * @param id     specified Device record to be updated
      * @return Modified Device record.
      */
     public Device updateDevice(Device device, long id) throws DeviceNotFoundException {
@@ -67,12 +82,13 @@ public class DeviceService {
             device1.setVendor(device.getVendor());
             logger.info("The device of id: " + id + " was updated");
             return deviceRepository.save(device1);
-        }).orElseThrow(() -> new DeviceNotFoundException("The specified Device with id: " + id +
-                                                      " could not be modified because it does not exist"));
+        }).orElseThrow(() -> new DeviceNotFoundException(
+                "The specified Device with id: " + id + " could not be modified because it does not exist"));
     }
 
     /**
      * Attempts to delete a Device record.
+     *
      * @param id Identifier of the device to be deleted.
      * @return True if the specified Device exists, False otherwise.
      */
@@ -84,5 +100,9 @@ public class DeviceService {
         }
         logger.warn("Device of id: " + id + " could not be deleted because it does not exist");
         return false;
+    }
+
+    public void setDeviceRepository(DeviceRepository deviceRepository) {
+        this.deviceRepository = deviceRepository;
     }
 }

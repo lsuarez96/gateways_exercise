@@ -136,7 +136,7 @@ Caused by: org.hibernate.TransientPropertyValueException: object references an u
 	at org.hibernate.event.service.internal.EventListenerGroupImpl.fireEventOnEachListener(EventListenerGroupImpl.java:107)
 	at org.hibernate.internal.SessionImpl.doFlush(SessionImpl.java:1407)
 	... 101 common frames omitted
-2022-05-21 00:44:56,254 ERROR org.springframework.test.context.TestContextManager [main] Caught exception while allowing TestExecutionListener [org.springframework.test.context.web.ServletTestExecutionListener@50dfbc58] to prepare test instance [com.musala.gateway.management.GatewayControllerTest@6b30ff23]
+2022-05-21 00:44:56,254 ERROR org.springframework.test.context.TestContextManager [main] Caught exception while allowing TestExecutionListener [org.springframework.test.context.web.ServletTestExecutionListener@50dfbc58] to prepare test instance [com.musala.gateway.management.GatewayServiceTest@6b30ff23]
 java.lang.IllegalStateException: Failed to load ApplicationContext
 	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContext(DefaultCacheAwareContextLoaderDelegate.java:132)
 	at org.springframework.test.context.support.DefaultTestContext.getApplicationContext(DefaultTestContext.java:124)
@@ -395,7 +395,7 @@ Caused by: org.hibernate.TransientPropertyValueException: object references an u
 	at org.hibernate.event.service.internal.EventListenerGroupImpl.fireEventOnEachListener(EventListenerGroupImpl.java:107)
 	at org.hibernate.internal.SessionImpl.doFlush(SessionImpl.java:1407)
 	... 101 common frames omitted
-2022-05-21 00:46:21,128 ERROR org.springframework.test.context.TestContextManager [main] Caught exception while allowing TestExecutionListener [org.springframework.test.context.web.ServletTestExecutionListener@4416d64f] to prepare test instance [com.musala.gateway.management.GatewayControllerTest@3a83cfbc]
+2022-05-21 00:46:21,128 ERROR org.springframework.test.context.TestContextManager [main] Caught exception while allowing TestExecutionListener [org.springframework.test.context.web.ServletTestExecutionListener@4416d64f] to prepare test instance [com.musala.gateway.management.GatewayServiceTest@3a83cfbc]
 java.lang.IllegalStateException: Failed to load ApplicationContext
 	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContext(DefaultCacheAwareContextLoaderDelegate.java:132)
 	at org.springframework.test.context.support.DefaultTestContext.getApplicationContext(DefaultTestContext.java:124)

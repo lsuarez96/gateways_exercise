@@ -3,6 +3,7 @@ package com.musala.gateway.management.service;
 import com.musala.gateway.management.exception.DeviceLimitException;
 import com.musala.gateway.management.exception.DeviceNotFoundException;
 import com.musala.gateway.management.exception.GatewayNotFoundException;
+import com.musala.gateway.management.exception.NotValidGatewayException;
 import com.musala.gateway.management.model.Device;
 import com.musala.gateway.management.model.Gateway;
 import com.musala.gateway.management.repository.GatewayRepository;
@@ -28,15 +29,42 @@ public class GatewayService {
     private int maxDevices;
 
     /**
+     * Default constructor
+     */
+    public GatewayService() {
+        maxDevices = 10;
+    }
+
+    /**
+     * Parametrized constructor. Since this class utilizes field injection this constructor is only used for test
+     * proposes (is more convenient to create manually the instance than set up an entire spring context just to test
+     * this class)
+     *
+     * @param gatewayRepository the repository for crud operations
+     * @param deviceService     a device service instance for device management
+     * @param maxDevices        max amount of devices allowed in a gateway
+     */
+    public GatewayService(GatewayRepository gatewayRepository, DeviceService deviceService, int maxDevices) {
+        this();
+        this.gatewayRepository = gatewayRepository;
+        this.deviceService = deviceService;
+        this.maxDevices = maxDevices;
+    }
+
+    /**
      * Creates a Gateway record.
      *
      * @param gateway Gateway information
      * @return The created record
-     *
      */
-    public Gateway create(Gateway gateway) {
+    public Gateway create(Gateway gateway) throws NotValidGatewayException {
+        if (gateway.isIPAddressValid()) {
             logger.info("Gateway record created");
             return gatewayRepository.save(gateway);
+        }
+        NotValidGatewayException e = new NotValidGatewayException("Provided IP address is not valid");
+        logger.error(e.getMessage(), e);
+        throw e;
     }
 
     /**
@@ -74,14 +102,27 @@ public class GatewayService {
      *                                  amount.
      * @throws GatewayNotFoundException thrown if the specified Gateway record to update does not exist
      */
-    public Gateway updateGateway(Gateway gateway, long id) throws DeviceLimitException, GatewayNotFoundException {
-        return gatewayRepository.findById(id).map(updated -> {
-            updated.setName(gateway.getName());
-            updated.setIpAddress(gateway.getIpAddress());
-            updated.setSerialNumber(gateway.getSerialNumber());
-            logger.info("The gateway of id: " + id + " was updated");
-            return gatewayRepository.save(updated);
-        }).orElseThrow(() -> new GatewayNotFoundException("Gateway of id:" + id + " not found at update"));
+    public Gateway updateGateway(Gateway gateway, long id)
+            throws DeviceLimitException, GatewayNotFoundException, NotValidGatewayException {
+        Gateway gwRecord = gatewayById(id);
+        if(gwRecord!=null){
+            if(gateway.isIPAddressValid()){
+                gwRecord.setName(gateway.getName());
+                gwRecord.setIpAddress(gateway.getIpAddress());
+                gwRecord.setSerialNumber(gateway.getSerialNumber());
+                logger.info("The gateway of id: " + id + " was updated");
+                return gatewayRepository.save(gwRecord);
+            }
+            NotValidGatewayException notValidGatewayException =
+                    new NotValidGatewayException("Provided IP address is not valid");
+            logger.error(notValidGatewayException.getMessage(),notValidGatewayException);
+            throw notValidGatewayException;
+        }else{
+            GatewayNotFoundException gatewayNotFoundException =
+                    new GatewayNotFoundException("Gateway of id:" + id + " not found at update");
+            logger.error(gatewayNotFoundException.getMessage(),gatewayNotFoundException);
+            throw gatewayNotFoundException;
+        }
 
     }
 
@@ -117,6 +158,7 @@ public class GatewayService {
         //Add this point both gateway and device have been found
         if (!gateway.getDevices().contains(
                 device)) {//if the gateway already has de device attached is not necessary to perform any operation
+          logger.info("Devices in gateway "+gateway.getDevices().size());
             if (gateway.getDevices().size()
                 < maxDevices) {//Check if the amount of attached devices is less than the configured limit
                 device.setGateway(gateway);
@@ -161,7 +203,7 @@ public class GatewayService {
             throw new DeviceNotFoundException("Device of id: " + deviceId + " could not be found");
         }
 
-        if (device.getGateway().getId() != gatewayId) {
+        if (device.getGateway()==null||device.getGateway().getId() != gatewayId) {
             logger.error("The specified device is not attached to the gateway");
             throw new DeviceNotFoundException(
                     "The specified device of id: " + deviceId + " is not attached to the specified gateway");
@@ -185,7 +227,7 @@ public class GatewayService {
         try {//Search for the specified gateway
             gateway = gatewayById(gatewayId);
         } catch (Throwable e) {
-            logger.error("Gateway of id:"+gatewayId+" not found", e);
+            logger.error("Gateway of id:" + gatewayId + " not found", e);
             throw new GatewayNotFoundException("Gateway of id: " + gatewayId + " could not be found");
         }
         return gateway.getDevices();
@@ -204,5 +246,9 @@ public class GatewayService {
             return true;
         }
         return false;
+    }
+
+    public void setDeviceService(DeviceService deviceService) {
+        this.deviceService = deviceService;
     }
 }

@@ -77,4 +77,11 @@ public class Gateway {
     public List<Device> getDevices() {
         return devices;
     }
+
+    public boolean isIPAddressValid() {
+        String segment = "(\\d{1,2}|(0|1)\\d{2}|2[0-4]\\d|25[0-5])";
+        //An IP address is composed of 4 segments, delimited by a dot (.)
+        String ipRegex = segment + "\\." + segment + "\\." + segment + "\\." + segment;
+        return ipAddress.matches(ipRegex);
+    }
 }

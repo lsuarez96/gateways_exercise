@@ -3,6 +3,7 @@ package com.musala.gateway.management.controller;
 import com.musala.gateway.management.exception.DeviceLimitException;
 import com.musala.gateway.management.exception.DeviceNotFoundException;
 import com.musala.gateway.management.exception.GatewayNotFoundException;
+import com.musala.gateway.management.exception.NotValidGatewayException;
 import com.musala.gateway.management.model.Device;
 import com.musala.gateway.management.model.Gateway;
 import com.musala.gateway.management.service.GatewayService;
@@ -54,8 +55,13 @@ public class GatewayController {
 
     @PostMapping("/create")
     public ResponseEntity<?> createGateway(@Valid @RequestBody Gateway gateway) {
-           Gateway record = gatewayService.create(gateway);
+        try {
+            Gateway record = gatewayService.create(gateway);
             return new ResponseEntity<>(record, HttpStatus.CREATED);
+        } catch (NotValidGatewayException e) {
+            logger.error(e.getMessage(), e);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @DeleteMapping("/delete/{id}")
@@ -78,9 +84,17 @@ public class GatewayController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (GatewayNotFoundException e) {
             gateway.setId(id);
-            Gateway created = gatewayService.create(gateway);
+            Gateway created = null;
+            try {
+                created = gatewayService.create(gateway);
+            } catch (NotValidGatewayException ex) {
+                logger.error(ex.getMessage(), ex);
+            }
             logger.error("/gateway/update responded CREATED", e);
             return new ResponseEntity<>(created, HttpStatus.CREATED);
+        } catch (NotValidGatewayException e) {
+            logger.error("/gateway/update responded BAD_REQUEST", e);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -123,6 +137,13 @@ public class GatewayController {
         }
     }
 
+    /**
+     * Although must exceptions are captured within the endpoints others like model validation exceptions may not be
+     * captured. This function will ensure a proper response is given in such cases.
+     *
+     * @param ex exception thrown
+     * @return a map with the fields that could not pass validation tests and the corresponding error message.
+     */
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler( {MethodArgumentNotValidException.class})
     public Map<String, String> handleValidationExceptions(MethodArgumentNotValidException ex) {
