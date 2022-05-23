@@ -7,4 +7,6 @@ import org.springframework.data.repository.CrudRepository;
 import java.util.Optional;
 
 public interface DeviceRepository extends CrudRepository<Device,Long> {
+    @Query("Select d from Device d where d.uid=?1")
+    public Optional<Device> findByUID(long uid);
 }

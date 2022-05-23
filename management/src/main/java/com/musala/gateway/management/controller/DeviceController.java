@@ -1,6 +1,7 @@
 package com.musala.gateway.management.controller;
 
 import com.musala.gateway.management.exception.DeviceNotFoundException;
+import com.musala.gateway.management.exception.NotValidDeviceException;
 import com.musala.gateway.management.model.Device;
 import com.musala.gateway.management.service.DeviceService;
 import org.slf4j.Logger;
@@ -71,8 +72,15 @@ public class DeviceController {
      */
     @PostMapping("/create")
     public ResponseEntity<?> create(@Valid @RequestBody Device device) {
-        Device created = deviceService.createDevice(device);
-        return new ResponseEntity<>(created, HttpStatus.CREATED);
+        try {
+            Device created = deviceService.createDevice(device);
+            return new ResponseEntity<>(created, HttpStatus.CREATED);
+        } catch (NotValidDeviceException e) {
+            Map<String, String> errors = new HashMap<>();
+            errors.put(e.getClass().getSimpleName(), e.getMessage());
+            return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+        }
+
     }
 
     /**
@@ -92,9 +100,20 @@ public class DeviceController {
             return new ResponseEntity<>(updated, HttpStatus.OK);
         } catch (DeviceNotFoundException e) {
             device.setId(id);
-            Device created = deviceService.createDevice(device);
-            logger.info("/device/update/ responded CREATED because the Devise could not be found");
-            return new ResponseEntity<>(created, HttpStatus.CREATED);
+            Device created = null;
+            try {
+                created = deviceService.createDevice(device);
+                logger.info("/device/update/ responded CREATED because the Devise could not be found");
+                return new ResponseEntity<>(created, HttpStatus.CREATED);
+            } catch (NotValidDeviceException ex) {
+                Map<String, String> errors = new HashMap<>();
+                errors.put(e.getClass().getSimpleName(), e.getMessage());
+                return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+            }
+        } catch (NotValidDeviceException e) {
+            Map<String, String> errors = new HashMap<>();
+            errors.put(e.getClass().getSimpleName(), e.getMessage());
+            return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
         }
 
     }
@@ -110,9 +129,8 @@ public class DeviceController {
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler({MethodArgumentNotValidException.class})
-    public Map<String, String> handleValidationExceptions(
-            MethodArgumentNotValidException ex) {
+    @ExceptionHandler( {MethodArgumentNotValidException.class})
+    public Map<String, String> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getAllErrors().forEach((error) -> {
             String fieldName = ((FieldError) error).getField();

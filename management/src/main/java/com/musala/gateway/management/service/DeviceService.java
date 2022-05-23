@@ -1,6 +1,7 @@
 package com.musala.gateway.management.service;
 
 import com.musala.gateway.management.exception.DeviceNotFoundException;
+import com.musala.gateway.management.exception.NotValidDeviceException;
 import com.musala.gateway.management.model.Device;
 import com.musala.gateway.management.repository.DeviceRepository;
 import org.slf4j.Logger;
@@ -61,10 +62,14 @@ public class DeviceService {
      * @param device Device information.
      * @return Stored Device Record
      */
-    public Device createDevice(Device device) {
-        Device save = deviceRepository.save(device);
-        logger.info("Device with id: " + save.getId() + " created");
-        return save;
+    public Device createDevice(Device device) throws NotValidDeviceException {
+        Device byUid = deviceRepository.findByUID(device.getUid()).orElse(null);
+        if (byUid == null) {
+            Device save = deviceRepository.save(device);
+            logger.info("Device with id: " + save.getId() + " created");
+            return save;
+        }
+        throw new NotValidDeviceException("A device with the specified uid already exist");
     }
 
     /**
@@ -74,16 +79,24 @@ public class DeviceService {
      * @param id     specified Device record to be updated
      * @return Modified Device record.
      */
-    public Device updateDevice(Device device, long id) throws DeviceNotFoundException {
-        return deviceRepository.findById(id).map(device1 -> {
-            device1.setDeviceStatus(device.getDeviceStatus());
-            device1.setCreatedAt(device.getCreatedAt());
-            device1.setUid(device.getUid());
-            device1.setVendor(device.getVendor());
-            logger.info("The device of id: " + id + " was updated");
-            return deviceRepository.save(device1);
-        }).orElseThrow(() -> new DeviceNotFoundException(
-                "The specified Device with id: " + id + " could not be modified because it does not exist"));
+    public Device updateDevice(Device device, long id) throws DeviceNotFoundException, NotValidDeviceException {
+        Device update = deviceRepository.findById(id).orElse(null);
+        if (update == null) {
+            throw new DeviceNotFoundException(
+                    "The specified Device with id: " + id + " could not be modified because it does not exist");
+        }
+        Device byUid = deviceRepository.findByUID(device.getUid()).orElse(null);
+        if (byUid == null || byUid.getId() == id) {
+            update.setDeviceStatus(device.getDeviceStatus());
+            if (device.getCreatedAt() != null) {
+                update.setCreatedAt(device.getCreatedAt());
+            }
+            update.setUid(device.getUid());
+            update.setVendor(device.getVendor());
+            logger.info("Device of id: " + id + " updated");
+            return deviceRepository.save(update);
+        }
+        throw new NotValidDeviceException("The specified uid is asociated to another device");
     }
 
     /**

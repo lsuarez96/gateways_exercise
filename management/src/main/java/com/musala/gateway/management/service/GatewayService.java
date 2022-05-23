@@ -1,9 +1,6 @@
 package com.musala.gateway.management.service;
 
-import com.musala.gateway.management.exception.DeviceLimitException;
-import com.musala.gateway.management.exception.DeviceNotFoundException;
-import com.musala.gateway.management.exception.GatewayNotFoundException;
-import com.musala.gateway.management.exception.NotValidGatewayException;
+import com.musala.gateway.management.exception.*;
 import com.musala.gateway.management.model.Device;
 import com.musala.gateway.management.model.Gateway;
 import com.musala.gateway.management.repository.GatewayRepository;
@@ -58,13 +55,19 @@ public class GatewayService {
      * @return The created record
      */
     public Gateway create(Gateway gateway) throws NotValidGatewayException {
-        if (gateway.isIPAddressValid()) {
-            logger.info("Gateway record created");
-            return gatewayRepository.save(gateway);
+        if (!gateway.isIPAddressValid()) {
+            NotValidGatewayException e = new NotValidGatewayException("Provided IP address is not valid");
+            logger.error(e.getMessage(), e);
+            throw e;
         }
-        NotValidGatewayException e = new NotValidGatewayException("Provided IP address is not valid");
-        logger.error(e.getMessage(), e);
-        throw e;
+        if (gatewayRepository.findBySerialNumber(gateway.getSerialNumber()).isPresent()) {
+            NotValidGatewayException e = new NotValidGatewayException(
+                    "A gateway with serial number: " + gateway.getSerialNumber() + " already exist");
+            logger.error(e.getMessage(), e);
+            throw e;
+        }
+        logger.info("Gateway record created");
+        return gatewayRepository.save(gateway);
     }
 
     /**
@@ -105,22 +108,29 @@ public class GatewayService {
     public Gateway updateGateway(Gateway gateway, long id)
             throws DeviceLimitException, GatewayNotFoundException, NotValidGatewayException {
         Gateway gwRecord = gatewayById(id);
-        if(gwRecord!=null){
-            if(gateway.isIPAddressValid()){
-                gwRecord.setName(gateway.getName());
-                gwRecord.setIpAddress(gateway.getIpAddress());
-                gwRecord.setSerialNumber(gateway.getSerialNumber());
-                logger.info("The gateway of id: " + id + " was updated");
-                return gatewayRepository.save(gwRecord);
+        if (gwRecord != null) {
+            if (!gateway.isIPAddressValid()) {
+                NotValidGatewayException notValidGatewayException =
+                        new NotValidGatewayException("Provided IP address is not valid");
+                logger.error(notValidGatewayException.getMessage(), notValidGatewayException);
+                throw notValidGatewayException;
             }
-            NotValidGatewayException notValidGatewayException =
-                    new NotValidGatewayException("Provided IP address is not valid");
-            logger.error(notValidGatewayException.getMessage(),notValidGatewayException);
-            throw notValidGatewayException;
-        }else{
+            Gateway bySerialNumber = gatewayRepository.findBySerialNumber(gateway.getSerialNumber()).orElse(null);
+            if (bySerialNumber != null && bySerialNumber.getId() != id) {
+                NotValidGatewayException e = new NotValidGatewayException(
+                        "A gateway with serial number: " + gateway.getSerialNumber() + " already exist");
+                logger.error(e.getMessage(), e);
+                throw e;
+            }
+            gwRecord.setName(gateway.getName());
+            gwRecord.setIpAddress(gateway.getIpAddress());
+            gwRecord.setSerialNumber(gateway.getSerialNumber());
+            logger.info("The gateway of id: " + id + " was updated");
+            return gatewayRepository.save(gwRecord);
+        } else {
             GatewayNotFoundException gatewayNotFoundException =
                     new GatewayNotFoundException("Gateway of id:" + id + " not found at update");
-            logger.error(gatewayNotFoundException.getMessage(),gatewayNotFoundException);
+            logger.error(gatewayNotFoundException.getMessage(), gatewayNotFoundException);
             throw gatewayNotFoundException;
         }
 
@@ -158,12 +168,17 @@ public class GatewayService {
         //Add this point both gateway and device have been found
         if (!gateway.getDevices().contains(
                 device)) {//if the gateway already has de device attached is not necessary to perform any operation
-          logger.info("Devices in gateway "+gateway.getDevices().size());
+            logger.info("Devices in gateway " + gateway.getDevices().size());
             if (gateway.getDevices().size()
                 < maxDevices) {//Check if the amount of attached devices is less than the configured limit
                 device.setGateway(gateway);
-                deviceService.updateDevice(device,
-                                           deviceId);//Since the device is the owner of the gateway the device record
+                try {
+                    deviceService.updateDevice(device,
+                                               deviceId);//Since the device is the owner of the gateway the device
+                    // record
+                } catch (NotValidDeviceException e) {
+                    logger.error(e.getMessage(), e);
+                }
                 // is the one updated
                 logger.info("Device attached to gateway, attempting to save the change");
             } else {
@@ -188,11 +203,8 @@ public class GatewayService {
      */
     public Gateway detachDevice(long gatewayId, long deviceId)
             throws GatewayNotFoundException, DeviceNotFoundException {
-        Gateway gateway;
-        try {//Search for the specified gateway
-            gateway = gatewayById(gatewayId);
-        } catch (Throwable e) {
-            logger.error("Could not detach device due to gateway not found", e);
+        if(!gatewayRepository.existsById(gatewayId)){
+            logger.error("Could not detach device due to gateway not found");
             throw new GatewayNotFoundException("Gateway of id: " + gatewayId + " could not be found");
         }
         Device device;
@@ -203,14 +215,18 @@ public class GatewayService {
             throw new DeviceNotFoundException("Device of id: " + deviceId + " could not be found");
         }
 
-        if (device.getGateway()==null||device.getGateway().getId() != gatewayId) {
+        if (device.getGateway() == null || device.getGateway().getId() != gatewayId) {
             logger.error("The specified device is not attached to the gateway");
             throw new DeviceNotFoundException(
                     "The specified device of id: " + deviceId + " is not attached to the specified gateway");
         }
         logger.info("Device detached from gateway");
         device.setGateway(null);
-        deviceService.updateDevice(device, deviceId);
+        try {
+            deviceService.updateDevice(device, deviceId);
+        } catch (NotValidDeviceException e) {
+            logger.error(e.getMessage(), e);
+        }
         return gatewayById(gatewayId);
     }
 
@@ -241,7 +257,16 @@ public class GatewayService {
      * @return True if the Gateway exists and therefore is deleted, False otherwise.
      */
     public boolean deleteGateway(long id) {
-        if (gatewayRepository.existsById(id)) {
+        Gateway gwRecord = gatewayRepository.findById(id).orElse(null);
+        if (gwRecord != null) {
+            for (Device d : gwRecord.getDevices()) {
+                d.setGateway(null);
+                try {
+                    deviceService.updateDevice(d, d.getId());
+                } catch (DeviceNotFoundException | NotValidDeviceException e) {
+                    logger.error(e.getMessage(), e);
+                }
+            }
             gatewayRepository.deleteById(id);
             return true;
         }

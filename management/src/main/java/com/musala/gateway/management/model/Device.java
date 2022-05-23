@@ -1,19 +1,25 @@
 package com.musala.gateway.management.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.validation.annotation.Validated;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import java.time.Instant;
+import java.util.Calendar;
 import java.util.Date;
 
 @Entity
 @Table(name = "device")
+@Validated
 public class Device {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     @Column(name = "uid", nullable = false, unique = true)
-    @NotBlank(message = "UID most be specified")
+    @NotNull(message = "UID most be specified")
     private long uid;//Assumed that the uid is a unique identifier for the device
     @Column(name = "vendor")
     private String vendor;
@@ -22,16 +28,17 @@ public class Device {
     private Date createdAt;
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
-    private DeviceStatus deviceStatus;
+    private DeviceStatus deviceStatus = DeviceStatus.ONLINE;
     /**
      * Device is marked as the owning side of the one-to-many relationship
      */
     @ManyToOne
-    @JoinColumn(name = "gateway_id")
+    @JoinColumn(name = "gateway_id", nullable = true)
     @JsonIgnore
     private Gateway gateway;
 
     public Device() {
+        createdAt = Calendar.getInstance().getTime();
     }
 
     public Device(long uid, String vendor, Date createdAt, DeviceStatus deviceStatus) {
