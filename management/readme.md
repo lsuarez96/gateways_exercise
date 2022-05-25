@@ -13,13 +13,13 @@ Example of a REST API for storing gateways information.
 The project is packaged as jar and has an embbeded tomcat server, so it is self contained.
 To package and run the service run the script in the root folder of the project:
 
-./package-run.sh
+    ./package-run.sh
 
 The jar will be located under the target directory
 <H3>Test</H3>
 To run the automated test run the script in the project root folder:
 
-./run-test.sh
+    ./run-test.sh
 
 <b>Designed tests include:</b>
 
