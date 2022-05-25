@@ -36,7 +36,7 @@ public class Gateway {
      * of the one-to-many relationship. Therefore, this attribute is not really mapped in the database, only the
      * reference to Gateway in Device.
      */
-    @OneToMany(mappedBy = "gateway", orphanRemoval = false, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "gateway", fetch = FetchType.EAGER)
     private List<Device> devices;
 
     public Gateway() {

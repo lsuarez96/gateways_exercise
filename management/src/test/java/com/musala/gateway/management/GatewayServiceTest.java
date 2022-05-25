@@ -57,6 +57,7 @@ public class GatewayServiceTest {
 
     /**
      * Tests whether the creation of a Gateway with valid IP address succeeds.
+     *
      * @throws NotValidGatewayException
      */
     @Test
@@ -82,7 +83,7 @@ public class GatewayServiceTest {
      */
     @Test
     void gatewayUpdateFailsOnGatewayNotFound() {
-        long id = 0;
+        long id = 1;
         when(gatewayRepository.findById(id)).thenReturn(Optional.empty());
         Assertions.assertThrows(GatewayNotFoundException.class,
                                 () -> gatewayService.updateGateway(validIpGateway(), id));
@@ -94,7 +95,7 @@ public class GatewayServiceTest {
      */
     @Test
     void gatewayUpdateFailsOnBadIP() {
-        long id = 0;
+        long id = 1;
         Gateway gateway = notValidIpGateway();
         gateway.setId(id);
         when(gatewayRepository.findById(id)).thenReturn(Optional.of(maxDevicesGateway()));
@@ -106,7 +107,7 @@ public class GatewayServiceTest {
      */
     @Test
     void gatewayAttachDeviceFailsBecauseDeviceLimit() {
-        long gwId = 0;
+        long gwId = 1;
         long devId = 3;
         when(gatewayRepository.findById(gwId)).thenReturn(Optional.of(maxDevicesGateway()));
         when(deviceRepository.findById(devId)).thenReturn(Optional.of(getTestDevice()));
@@ -115,10 +116,14 @@ public class GatewayServiceTest {
 
     @Test
     void gatewayDetachDeviceFailsBecauseDeviceNotAssigned() {
-        long gwId = 0;
+        long gwId = 1;
         long devId = 3;
-        when(gatewayRepository.findById(gwId)).thenReturn(Optional.of(maxDevicesGateway()));
-        when(deviceRepository.findById(devId)).thenReturn(Optional.of(getTestDevice()));
+        Gateway maxDevicesGateway = maxDevicesGateway();
+        maxDevicesGateway.setId(gwId);
+        when(gatewayRepository.existsById(gwId)).thenReturn(true);
+        Device attachedDevice = getTestDevice();
+        attachedDevice.setId(devId);
+        when(deviceRepository.findById(devId)).thenReturn(Optional.of(attachedDevice));
         DeviceNotFoundException ex =
                 Assertions.assertThrows(DeviceNotFoundException.class, () -> gatewayService.detachDevice(gwId, devId));
         assertThat(ex.getMessage()).isEqualTo(

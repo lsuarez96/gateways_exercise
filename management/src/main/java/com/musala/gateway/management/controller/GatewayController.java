@@ -1,9 +1,6 @@
 package com.musala.gateway.management.controller;
 
-import com.musala.gateway.management.exception.DeviceLimitException;
-import com.musala.gateway.management.exception.DeviceNotFoundException;
-import com.musala.gateway.management.exception.GatewayNotFoundException;
-import com.musala.gateway.management.exception.NotValidGatewayException;
+import com.musala.gateway.management.exception.*;
 import com.musala.gateway.management.model.Device;
 import com.musala.gateway.management.model.Gateway;
 import com.musala.gateway.management.service.GatewayService;
@@ -54,17 +51,9 @@ public class GatewayController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<?> createGateway(@Valid @RequestBody Gateway gateway) {
-
-        try {
-            Gateway record = gatewayService.create(gateway);
-            return new ResponseEntity<>(record, HttpStatus.CREATED);
-        } catch (NotValidGatewayException e) {
-            Map<String,String> errors=new HashMap<>();
-            errors.put(e.getClass().getSimpleName(),e.getMessage());
-            logger.error(e.getMessage(), e);
-            return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
-        }
+    public ResponseEntity<?> createGateway(@Valid @RequestBody Gateway gateway) throws NotValidGatewayException {
+        Gateway record = gatewayService.create(gateway);
+        return new ResponseEntity<>(record, HttpStatus.CREATED);
     }
 
     @DeleteMapping("/delete/{id}")
@@ -77,75 +66,40 @@ public class GatewayController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateGateway(@Valid @RequestBody Gateway gateway, @PathVariable long id) {
-        try {
-            logger.info("/gateway/update Requested");
-            Gateway updated = gatewayService.updateGateway(gateway, id);
-            logger.info("/gateway/update responded OK");
-            return new ResponseEntity<>(updated, HttpStatus.OK);
-        } catch (DeviceLimitException e) {
-            Map<String,String> errors=new HashMap<>();
-            errors.put(e.getClass().getSimpleName(),e.getMessage());
-            return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
-        } catch (GatewayNotFoundException e) {
-            gateway.setId(id);
-            Gateway created = null;
-            try {
-                created = gatewayService.create(gateway);
-            } catch (NotValidGatewayException ex) {
-                logger.error(ex.getMessage(), ex);
-            }
-            logger.error("/gateway/update responded CREATED", e);
-            return new ResponseEntity<>(created, HttpStatus.CREATED);
-        } catch (NotValidGatewayException e) {
-            logger.error("/gateway/update responded BAD_REQUEST", e);
-            Map<String,String> errors=new HashMap<>();
-            errors.put(e.getClass().getSimpleName(),e.getMessage());
-            return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
-        }
+    public ResponseEntity<?> updateGateway(@Valid @RequestBody Gateway gateway, @PathVariable long id)
+            throws NotValidGatewayException, GatewayNotFoundException {
+        logger.info("/gateway/update Requested");
+        Gateway updated = gatewayService.updateGateway(gateway, id);
+        logger.info("/gateway/update responded OK");
+        return new ResponseEntity<>(updated, HttpStatus.OK);
+
     }
 
     @PutMapping("/{gateway_id}/attach/{device_id}")
-    public ResponseEntity<?> attachDevice(@PathVariable long gateway_id, @PathVariable long device_id) {
-        try {
-            logger.info("/gateway/attach requested");
-            Gateway updated = gatewayService.attachDevice(gateway_id, device_id);
-            logger.info("/gateway/attach responded OK");
-            return new ResponseEntity<>(updated, HttpStatus.OK);
-        } catch (GatewayNotFoundException | DeviceNotFoundException | DeviceLimitException e) {
-            logger.warn("/gateway/attach responded BAD_REQUEST", e);
-            Map<String,String> errors=new HashMap<>();
-            errors.put(e.getClass().getSimpleName(),e.getMessage());
-            return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
-        }
+    public ResponseEntity<?> attachDevice(@PathVariable long gateway_id, @PathVariable long device_id)
+            throws DeviceLimitException, DeviceNotFoundException, GatewayNotFoundException {
+        logger.info("/gateway/attach requested");
+        Gateway updated = gatewayService.attachDevice(gateway_id, device_id);
+        logger.info("/gateway/attach responded OK");
+        return new ResponseEntity<>(updated, HttpStatus.OK);
+
     }
 
     @PutMapping("/{gateway_id}/detach/{device_id}")
-    public ResponseEntity<?> detachDevice(@PathVariable long gateway_id, @PathVariable long device_id) {
-        try {
-            logger.info("/gateway/detach requested");
-            Gateway updated = gatewayService.detachDevice(gateway_id, device_id);
-            logger.info("/gateway/detach responded");
-            return new ResponseEntity<>(updated, HttpStatus.OK);
-        } catch (GatewayNotFoundException | DeviceNotFoundException e) {
-            logger.warn("/gateway/detach responded BAD_REQUEST", e);
-            Map<String,String> errors=new HashMap<>();
-            errors.put(e.getClass().getSimpleName(),e.getMessage());
-            return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
-        }
+    public ResponseEntity<?> detachDevice(@PathVariable long gateway_id, @PathVariable long device_id)
+            throws DeviceNotFoundException, GatewayNotFoundException {
+        logger.info("/gateway/detach requested");
+        Gateway updated = gatewayService.detachDevice(gateway_id, device_id);
+        logger.info("/gateway/detach responded OK");
+        return new ResponseEntity<>(updated, HttpStatus.OK);
     }
 
     @GetMapping("/devices/{id}")
-    public ResponseEntity<?> gatewayDevices(@PathVariable long id) {
-        try {
-            logger.info("/gateway/devices requested");
-            List<Device> devices = gatewayService.gatewayDevices(id);
-            logger.info("/gateway/devices responded OK");
-            return new ResponseEntity<>(devices.toArray(new Device[0]), HttpStatus.OK);
-        } catch (GatewayNotFoundException e) {
-            logger.warn("/gateway/devices responded BAD REQUEST", e);
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+    public ResponseEntity<?> gatewayDevices(@PathVariable long id) throws GatewayNotFoundException {
+        logger.info("/gateway/devices requested");
+        List<Device> devices = gatewayService.gatewayDevices(id);
+        logger.info("/gateway/devices responded OK");
+        return new ResponseEntity<>(devices.toArray(new Device[0]), HttpStatus.OK);
     }
 
     /**
@@ -156,15 +110,28 @@ public class GatewayController {
      * @return a map with the fields that could not pass validation tests and the corresponding error message.
      */
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler( {MethodArgumentNotValidException.class})
-    public Map<String, String> handleValidationExceptions(MethodArgumentNotValidException ex) {
+    @ExceptionHandler( {
+            MethodArgumentNotValidException.class, DeviceLimitException.class, DeviceNotFoundException.class,
+            GatewayNotFoundException.class, NotValidGatewayException.class, NotValidDeviceException.class
+    })
+    @ResponseBody
+    public Map<String, String> handleValidationExceptions(Exception ex) {
         Map<String, String> errors = new HashMap<>();
+        if (ex instanceof MethodArgumentNotValidException) {
+            handleModelValidationExceptions((MethodArgumentNotValidException) ex, errors);
+        } else {
+            errors.put(ex.getClass().getSimpleName(), ex.getMessage());
+        }
+        return errors;
+    }
+
+    private void handleModelValidationExceptions(MethodArgumentNotValidException ex, Map<String, String> errors) {
         ex.getBindingResult().getAllErrors().forEach((error) -> {
             String fieldName = ((FieldError) error).getField();
             String errorMessage = error.getDefaultMessage();
-            logger.error("Gateway."+fieldName+":"+errorMessage,ex);
+            logger.error("Gateway." + fieldName + ":" + errorMessage, ex);
             errors.put(fieldName, errorMessage);
         });
-        return errors;
     }
+
 }

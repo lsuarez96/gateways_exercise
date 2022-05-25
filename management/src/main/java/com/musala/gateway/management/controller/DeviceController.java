@@ -71,15 +71,9 @@ public class DeviceController {
      * @return The device stored in the database.
      */
     @PostMapping("/create")
-    public ResponseEntity<?> create(@Valid @RequestBody Device device) {
-        try {
-            Device created = deviceService.createDevice(device);
-            return new ResponseEntity<>(created, HttpStatus.CREATED);
-        } catch (NotValidDeviceException e) {
-            Map<String, String> errors = new HashMap<>();
-            errors.put(e.getClass().getSimpleName(), e.getMessage());
-            return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
-        }
+    public ResponseEntity<?> create(@Valid @RequestBody Device device) throws NotValidDeviceException {
+        Device created = deviceService.createDevice(device);
+        return new ResponseEntity<>(created, HttpStatus.CREATED);
 
     }
 
@@ -92,30 +86,11 @@ public class DeviceController {
      * @return The resulting device from the update (or newly created device in case the specified one did not exist).
      */
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> update(@Valid @RequestBody Device device, @PathVariable long id) {
+    public ResponseEntity<?> update(@Valid @RequestBody Device device, @PathVariable long id)
+            throws DeviceNotFoundException, NotValidDeviceException {
         logger.info("Requested /device/update/" + id);
-        Device updated;
-        try {
-            updated = deviceService.updateDevice(device, id);
-            return new ResponseEntity<>(updated, HttpStatus.OK);
-        } catch (DeviceNotFoundException e) {
-            device.setId(id);
-            Device created = null;
-            try {
-                created = deviceService.createDevice(device);
-                logger.info("/device/update/ responded CREATED because the Devise could not be found");
-                return new ResponseEntity<>(created, HttpStatus.CREATED);
-            } catch (NotValidDeviceException ex) {
-                Map<String, String> errors = new HashMap<>();
-                errors.put(e.getClass().getSimpleName(), e.getMessage());
-                return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
-            }
-        } catch (NotValidDeviceException e) {
-            Map<String, String> errors = new HashMap<>();
-            errors.put(e.getClass().getSimpleName(), e.getMessage());
-            return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
-        }
-
+        Device updated = deviceService.updateDevice(device, id);
+        return new ResponseEntity<>(updated, HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/{id}")
@@ -129,14 +104,25 @@ public class DeviceController {
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler( {MethodArgumentNotValidException.class})
-    public Map<String, String> handleValidationExceptions(MethodArgumentNotValidException ex) {
+    @ExceptionHandler( {
+            MethodArgumentNotValidException.class, DeviceNotFoundException.class, NotValidDeviceException.class
+    })
+    @ResponseBody
+    public Map<String, String> handleValidationExceptions(Exception ex) {
         Map<String, String> errors = new HashMap<>();
+        if (ex instanceof MethodArgumentNotValidException) {
+            handleModelValidationsErrors((MethodArgumentNotValidException) ex, errors);
+        } else {
+            errors.put(ex.getClass().getSimpleName(), ex.getMessage());
+        }
+        return errors;
+    }
+
+    private void handleModelValidationsErrors(MethodArgumentNotValidException ex, Map<String, String> errors) {
         ex.getBindingResult().getAllErrors().forEach((error) -> {
             String fieldName = ((FieldError) error).getField();
             String errorMessage = error.getDefaultMessage();
             errors.put(fieldName, errorMessage);
         });
-        return errors;
     }
 }

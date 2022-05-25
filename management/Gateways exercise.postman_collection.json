@@ -1,0 +1,1718 @@
+{
+	"info": {
+		"_postman_id": "b84b2790-15d9-46ed-9adb-9021064d0050",
+		"name": "Gateways exercise",
+		"description": "Sample api that manages Gateways and asociated Devices. The api provides basic CRUD operations for both Gateway and Device resources. In addition, the gateway resource provides the required endpoints to attach and detach devices from a gateway.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "13457255"
+	},
+	"item": [
+		{
+			"name": "Gateways",
+			"item": [
+				{
+					"name": "Create Gateway",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\":\"gw\",\n    \"serialNumber\":\"sn\",\n    \"ipAddress\":\"10.8.6.70\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8089/gateway/create",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8089",
+							"path": [
+								"gateway",
+								"create"
+							]
+						},
+						"description": "Creates a gateway resource in the server.  \nA create request to this endpoint is successful when two conditions are met:\n\n<ul><li><p>serialNumber: there are not other gateways with the provided serial number</p></li><li><p>ipAddress: the IP address provided follows a valid format.</p></li></ul>\n\nIf one of these conditions are not met a 400 response code is returned along with a message indicating the violated constraint.  \nExamples for successful and not successful requests are provided for this endpoint."
+					},
+					"response": [
+						{
+							"name": "Succesfull",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\":\"gw\",\n    \"serialNumber\":\"sn\",\n    \"ipAddress\":\"10.8.6.70\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8089/gateway/create",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8089",
+									"path": [
+										"gateway",
+										"create"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 23 May 2022 01:17:08 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 4,\n    \"serialNumber\": \"sn\",\n    \"name\": \"gw\",\n    \"ipAddress\": \"10.8.6.70\",\n    \"devices\": []\n}"
+						},
+						{
+							"name": "Create Gateway: Unique Serial number constraint violated",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\":\"gw\",\n    \"serialNumber\":\"sn\",\n    \"ipAddress\":\"10.8.6.70\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8089/gateway/create",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8089",
+									"path": [
+										"gateway",
+										"create"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 23 May 2022 01:23:10 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"NotValidGatewayException\": \"A gateway with serial number: sn already exist\"\n}"
+						},
+						{
+							"name": "Create Gateway: Not valid ip address",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\":\"gw\",\n    \"serialNumber\":\"sn\",\n    \"ipAddress\":\"not.valid.ip.address\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8089/gateway/create",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8089",
+									"path": [
+										"gateway",
+										"create"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 23 May 2022 01:24:09 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"ipAddress\": \"Invalid IP Address\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Update Gateway",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\":\"updated_gw\",\n    \"serialNumber\":\"sn\",\n    \"ipAddress\":\"10.8.6.70\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8089/gateway/update/3",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8089",
+							"path": [
+								"gateway",
+								"update",
+								"3"
+							]
+						},
+						"description": "Updates the information of an existing gateway record. When updating a gateway it must be taken into account that:\n\n*   If the serial number is modified, it must be unique (no other gateway can have the same serial number), otherwise a 400 response code will be returned along with a Not Valid Gateway Error.\n*   The provided IP address must be valid, otherwise a 400 response code will be returned along with a Not Valid Gateway Error.\n*   If the gateway specified by the path variable does not exists a Gateway Not Found Error will be returned along with a 400 response code."
+					},
+					"response": [
+						{
+							"name": "Update Gateway: Successfull",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\":\"updated_gw\",\n    \"serialNumber\":\"sn\",\n    \"ipAddress\":\"10.8.6.70\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8089/gateway/update/1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8089",
+									"path": [
+										"gateway",
+										"update",
+										"1"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 23 May 2022 02:05:21 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 1,\n    \"serialNumber\": \"sn\",\n    \"name\": \"updated_gw\",\n    \"ipAddress\": \"10.8.6.70\",\n    \"devices\": [\n        {\n            \"id\": 1,\n            \"uid\": 1,\n            \"vendor\": \"Sony\",\n            \"createdAt\": \"2022-05-23T02:01:13.699+00:00\",\n            \"deviceStatus\": \"ONLINE\"\n        },\n        {\n            \"id\": 2,\n            \"uid\": 2,\n            \"vendor\": \"Apple\",\n            \"createdAt\": \"2022-05-23T02:01:13.699+00:00\",\n            \"deviceStatus\": \"ONLINE\"\n        },\n        {\n            \"id\": 3,\n            \"uid\": 3,\n            \"vendor\": \"Cisco\",\n            \"createdAt\": \"2022-05-23T02:01:13.699+00:00\",\n            \"deviceStatus\": \"ONLINE\"\n        },\n        {\n            \"id\": 4,\n            \"uid\": 4,\n            \"vendor\": \"Huawei\",\n            \"createdAt\": \"2022-05-23T02:01:13.699+00:00\",\n            \"deviceStatus\": \"ONLINE\"\n        },\n        {\n            \"id\": 5,\n            \"uid\": 5,\n            \"vendor\": \"Panasonic\",\n            \"createdAt\": \"2022-05-23T02:01:13.699+00:00\",\n            \"deviceStatus\": \"ONLINE\"\n        },\n        {\n            \"id\": 6,\n            \"uid\": 6,\n            \"vendor\": \"LG\",\n            \"createdAt\": \"2022-05-23T02:01:13.699+00:00\",\n            \"deviceStatus\": \"ONLINE\"\n        },\n        {\n            \"id\": 7,\n            \"uid\": 7,\n            \"vendor\": \"Samsung\",\n            \"createdAt\": \"2022-05-23T02:01:13.699+00:00\",\n            \"deviceStatus\": \"ONLINE\"\n        },\n        {\n            \"id\": 8,\n            \"uid\": 8,\n            \"vendor\": \"Logitech\",\n            \"createdAt\": \"2022-05-23T02:01:13.699+00:00\",\n            \"deviceStatus\": \"ONLINE\"\n        },\n        {\n            \"id\": 9,\n            \"uid\": 9,\n            \"vendor\": \"TP-Link\",\n            \"createdAt\": \"2022-05-23T02:01:13.699+00:00\",\n            \"deviceStatus\": \"ONLINE\"\n        }\n    ]\n}"
+						},
+						{
+							"name": "Update Gateway: Not valid IP",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\":\"updated_gw\",\n    \"serialNumber\":\"sn\",\n    \"ipAddress\":\"not.valid.ip\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8089/gateway/update/1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8089",
+									"path": [
+										"gateway",
+										"update",
+										"1"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 23 May 2022 02:06:13 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"ipAddress\": \"Invalid IP Address\"\n}"
+						},
+						{
+							"name": "Update Gateway: Gateway Not found",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\":\"updated_gw\",\n    \"serialNumber\":\"sn_other\",\n    \"ipAddress\":\"10.8.6.70\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8089/gateway/update/20",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8089",
+									"path": [
+										"gateway",
+										"update",
+										"20"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 25 May 2022 01:38:57 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"GatewayNotFoundException\": \"Gateway not found with ID: 20\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Gateways List",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8089/gateway/list",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8089",
+							"path": [
+								"gateway",
+								"list"
+							]
+						},
+						"description": "Retrieves all gateway records. If at least a gateway exist a 200 response code will be returned along with the existing gateways. If no gateway exist a 204 response code will be returned indicating that there are no gateway records."
+					},
+					"response": [
+						{
+							"name": "Gateways List",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8089/gateway/list",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8089",
+									"path": [
+										"gateway",
+										"list"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 23 May 2022 01:25:20 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"id\": 1,\n        \"serialNumber\": \"gw0\",\n        \"name\": \"gateway0\",\n        \"ipAddress\": \"10.8.6.50\",\n        \"devices\": [\n            {\n                \"id\": 1,\n                \"uid\": 1,\n                \"vendor\": \"Sony\",\n                \"createdAt\": \"2022-05-23T01:23:05.327+00:00\",\n                \"deviceStatus\": \"ONLINE\"\n            },\n            {\n                \"id\": 2,\n                \"uid\": 2,\n                \"vendor\": \"Apple\",\n                \"createdAt\": \"2022-05-23T01:23:05.327+00:00\",\n                \"deviceStatus\": \"ONLINE\"\n            },\n            {\n                \"id\": 3,\n                \"uid\": 3,\n                \"vendor\": \"Cisco\",\n                \"createdAt\": \"2022-05-23T01:23:05.327+00:00\",\n                \"deviceStatus\": \"ONLINE\"\n            },\n            {\n                \"id\": 4,\n                \"uid\": 4,\n                \"vendor\": \"Huawei\",\n                \"createdAt\": \"2022-05-23T01:23:05.327+00:00\",\n                \"deviceStatus\": \"ONLINE\"\n            },\n            {\n                \"id\": 5,\n                \"uid\": 5,\n                \"vendor\": \"Panasonic\",\n                \"createdAt\": \"2022-05-23T01:23:05.327+00:00\",\n                \"deviceStatus\": \"ONLINE\"\n            },\n            {\n                \"id\": 6,\n                \"uid\": 6,\n                \"vendor\": \"LG\",\n                \"createdAt\": \"2022-05-23T01:23:05.327+00:00\",\n                \"deviceStatus\": \"ONLINE\"\n            },\n            {\n                \"id\": 7,\n                \"uid\": 7,\n                \"vendor\": \"Samsung\",\n                \"createdAt\": \"2022-05-23T01:23:05.327+00:00\",\n                \"deviceStatus\": \"ONLINE\"\n            },\n            {\n                \"id\": 8,\n                \"uid\": 8,\n                \"vendor\": \"Logitech\",\n                \"createdAt\": \"2022-05-23T01:23:05.327+00:00\",\n                \"deviceStatus\": \"ONLINE\"\n            },\n            {\n                \"id\": 9,\n                \"uid\": 9,\n                \"vendor\": \"TP-Link\",\n                \"createdAt\": \"2022-05-23T01:23:05.327+00:00\",\n                \"deviceStatus\": \"ONLINE\"\n            },\n            {\n                \"id\": 10,\n                \"uid\": 10,\n                \"vendor\": \"Hawlett-Packard\",\n                \"createdAt\": \"2022-05-23T01:23:05.327+00:00\",\n                \"deviceStatus\": \"ONLINE\"\n            }\n        ]\n    },\n    {\n        \"id\": 2,\n        \"serialNumber\": \"gw1\",\n        \"name\": \"gateway0\",\n        \"ipAddress\": \"10.8.6.51\",\n        \"devices\": []\n    },\n    {\n        \"id\": 3,\n        \"serialNumber\": \"gw2\",\n        \"name\": \"gateway0\",\n        \"ipAddress\": \"10.8.6.52\",\n        \"devices\": []\n    },\n    {\n        \"id\": 4,\n        \"serialNumber\": \"sn\",\n        \"name\": \"gw\",\n        \"ipAddress\": \"10.8.6.70\",\n        \"devices\": []\n    }\n]"
+						}
+					]
+				},
+				{
+					"name": "Gateway View",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8089/gateway/view/2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8089",
+							"path": [
+								"gateway",
+								"view",
+								"2"
+							]
+						},
+						"description": "Retrieves the gateway specified by the path variable of the endpoint. If the specified gateway exists a 200 response code will be returned along with the requested gateway record. If it does not exist a 204 response code will be returned."
+					},
+					"response": [
+						{
+							"name": "Gateway View",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8089/gateway/view/1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8089",
+									"path": [
+										"gateway",
+										"view",
+										"1"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 23 May 2022 01:26:49 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 1,\n    \"serialNumber\": \"gw0\",\n    \"name\": \"gateway0\",\n    \"ipAddress\": \"10.8.6.50\",\n    \"devices\": [\n        {\n            \"id\": 1,\n            \"uid\": 1,\n            \"vendor\": \"Sony\",\n            \"createdAt\": \"2022-05-23T01:23:05.327+00:00\",\n            \"deviceStatus\": \"ONLINE\"\n        },\n        {\n            \"id\": 2,\n            \"uid\": 2,\n            \"vendor\": \"Apple\",\n            \"createdAt\": \"2022-05-23T01:23:05.327+00:00\",\n            \"deviceStatus\": \"ONLINE\"\n        },\n        {\n            \"id\": 3,\n            \"uid\": 3,\n            \"vendor\": \"Cisco\",\n            \"createdAt\": \"2022-05-23T01:23:05.327+00:00\",\n            \"deviceStatus\": \"ONLINE\"\n        },\n        {\n            \"id\": 4,\n            \"uid\": 4,\n            \"vendor\": \"Huawei\",\n            \"createdAt\": \"2022-05-23T01:23:05.327+00:00\",\n            \"deviceStatus\": \"ONLINE\"\n        },\n        {\n            \"id\": 5,\n            \"uid\": 5,\n            \"vendor\": \"Panasonic\",\n            \"createdAt\": \"2022-05-23T01:23:05.327+00:00\",\n            \"deviceStatus\": \"ONLINE\"\n        },\n        {\n            \"id\": 6,\n            \"uid\": 6,\n            \"vendor\": \"LG\",\n            \"createdAt\": \"2022-05-23T01:23:05.327+00:00\",\n            \"deviceStatus\": \"ONLINE\"\n        },\n        {\n            \"id\": 7,\n            \"uid\": 7,\n            \"vendor\": \"Samsung\",\n            \"createdAt\": \"2022-05-23T01:23:05.327+00:00\",\n            \"deviceStatus\": \"ONLINE\"\n        },\n        {\n            \"id\": 8,\n            \"uid\": 8,\n            \"vendor\": \"Logitech\",\n            \"createdAt\": \"2022-05-23T01:23:05.327+00:00\",\n            \"deviceStatus\": \"ONLINE\"\n        },\n        {\n            \"id\": 9,\n            \"uid\": 9,\n            \"vendor\": \"TP-Link\",\n            \"createdAt\": \"2022-05-23T01:23:05.327+00:00\",\n            \"deviceStatus\": \"ONLINE\"\n        },\n        {\n            \"id\": 10,\n            \"uid\": 10,\n            \"vendor\": \"Hawlett-Packard\",\n            \"createdAt\": \"2022-05-23T01:23:05.327+00:00\",\n            \"deviceStatus\": \"ONLINE\"\n        }\n    ]\n}"
+						},
+						{
+							"name": "Unexisting Gateway",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8089/gateway/view/0",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8089",
+									"path": [
+										"gateway",
+										"view",
+										"0"
+									]
+								}
+							},
+							"status": "No Content",
+							"code": 204,
+							"_postman_previewlanguage": "plain",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Mon, 23 May 2022 01:27:22 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": ""
+						}
+					]
+				},
+				{
+					"name": "Gateway Devices",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8089/gateway/devices/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8089",
+							"path": [
+								"gateway",
+								"devices",
+								"1"
+							]
+						},
+						"description": "Retrieves all devices attached to a specified gateway. If the specified gateway has at least one device attached a 200 response code will be returned along with a list containing the devices of a gateway. If no device is attached to the gateway a 204 response code will be returned."
+					},
+					"response": [
+						{
+							"name": "Gateway Devices",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8089/gateway/devices/1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8089",
+									"path": [
+										"gateway",
+										"devices",
+										"1"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 23 May 2022 01:28:32 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"id\": 1,\n        \"uid\": 1,\n        \"vendor\": \"Sony\",\n        \"createdAt\": \"2022-05-23T01:23:05.327+00:00\",\n        \"deviceStatus\": \"ONLINE\"\n    },\n    {\n        \"id\": 2,\n        \"uid\": 2,\n        \"vendor\": \"Apple\",\n        \"createdAt\": \"2022-05-23T01:23:05.327+00:00\",\n        \"deviceStatus\": \"ONLINE\"\n    },\n    {\n        \"id\": 3,\n        \"uid\": 3,\n        \"vendor\": \"Cisco\",\n        \"createdAt\": \"2022-05-23T01:23:05.327+00:00\",\n        \"deviceStatus\": \"ONLINE\"\n    },\n    {\n        \"id\": 4,\n        \"uid\": 4,\n        \"vendor\": \"Huawei\",\n        \"createdAt\": \"2022-05-23T01:23:05.327+00:00\",\n        \"deviceStatus\": \"ONLINE\"\n    },\n    {\n        \"id\": 5,\n        \"uid\": 5,\n        \"vendor\": \"Panasonic\",\n        \"createdAt\": \"2022-05-23T01:23:05.327+00:00\",\n        \"deviceStatus\": \"ONLINE\"\n    },\n    {\n        \"id\": 6,\n        \"uid\": 6,\n        \"vendor\": \"LG\",\n        \"createdAt\": \"2022-05-23T01:23:05.327+00:00\",\n        \"deviceStatus\": \"ONLINE\"\n    },\n    {\n        \"id\": 7,\n        \"uid\": 7,\n        \"vendor\": \"Samsung\",\n        \"createdAt\": \"2022-05-23T01:23:05.327+00:00\",\n        \"deviceStatus\": \"ONLINE\"\n    },\n    {\n        \"id\": 8,\n        \"uid\": 8,\n        \"vendor\": \"Logitech\",\n        \"createdAt\": \"2022-05-23T01:23:05.327+00:00\",\n        \"deviceStatus\": \"ONLINE\"\n    },\n    {\n        \"id\": 9,\n        \"uid\": 9,\n        \"vendor\": \"TP-Link\",\n        \"createdAt\": \"2022-05-23T01:23:05.327+00:00\",\n        \"deviceStatus\": \"ONLINE\"\n    },\n    {\n        \"id\": 10,\n        \"uid\": 10,\n        \"vendor\": \"Hawlett-Packard\",\n        \"createdAt\": \"2022-05-23T01:23:05.327+00:00\",\n        \"deviceStatus\": \"ONLINE\"\n    }\n]"
+						},
+						{
+							"name": "Gateway No Devices",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8089/gateway/devices/2",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8089",
+									"path": [
+										"gateway",
+										"devices",
+										"2"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 23 May 2022 01:28:50 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "[]"
+						}
+					]
+				},
+				{
+					"name": "Gateway Attach Device",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8089/gateway/2/attach/11",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8089",
+							"path": [
+								"gateway",
+								"2",
+								"attach",
+								"11"
+							]
+						},
+						"description": "Attaches a device to a gateway. This request will be successful if:\n\n<ol><li><p>The gateway specified in the first path variable exist. If this condition is not met a Gateway Not Found Error message will be returned along with a 400 response code.</p></li><li><p>The device specified in the second path variable exist. If this condition is not met a Device Not Found Error message will be returned along with a 400 response code.</p></li><li><p>The device limit of the gateway is not exceded (the amount of devices currently attached is strictly inferior to the device limit). If this condition is not met a Device Limit Error message will be returned along with a 400 response code.</p></li></ol>"
+					},
+					"response": [
+						{
+							"name": "Gateway Attach Device Successfull",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8089/gateway/2/attach/11",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8089",
+									"path": [
+										"gateway",
+										"2",
+										"attach",
+										"11"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 23 May 2022 01:31:06 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 2,\n    \"serialNumber\": \"gw1\",\n    \"name\": \"gateway0\",\n    \"ipAddress\": \"10.8.6.51\",\n    \"devices\": [\n        {\n            \"id\": 11,\n            \"uid\": 11,\n            \"vendor\": \"IBM\",\n            \"createdAt\": \"2022-05-23T01:23:05.327+00:00\",\n            \"deviceStatus\": \"ONLINE\"\n        }\n    ]\n}"
+						},
+						{
+							"name": "Gateway Attach Device: limit exceeded",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8089/gateway/1/attach/12",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8089",
+									"path": [
+										"gateway",
+										"1",
+										"attach",
+										"12"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 23 May 2022 01:31:56 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"DeviceLimitException\": \"The amount of devices exceeds the predefined limit of 10 devices\"\n}"
+						},
+						{
+							"name": "Gateway Attach Device: Attach unexisting device",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8089/gateway/2/attach/20",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8089",
+									"path": [
+										"gateway",
+										"2",
+										"attach",
+										"20"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 23 May 2022 01:32:37 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"DeviceNotFoundException\": \"Device of id: 20 could not be found\"\n}"
+						},
+						{
+							"name": "Gateway Attach Device: Attach to unexisting gateway",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8089/gateway/0/attach/13",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8089",
+									"path": [
+										"gateway",
+										"0",
+										"attach",
+										"13"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 23 May 2022 01:33:20 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"GatewayNotFoundException\": \"Gateway of id: 0 could not be found\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Gateway Detach Device",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8089/gateway/1/detach/9",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8089",
+							"path": [
+								"gateway",
+								"1",
+								"detach",
+								"9"
+							]
+						},
+						"description": "Detaches a device from a gateway. This request will be successful if:\n\n<ol><li><p>The gateway specified in the first path variable exist. If this condition is not met a Gateway Not Found Error message will be returned along with a 400 response code.</p></li><li><p>The device specified in the second path variable exist. If this condition is not met a Device Not Found Error message will be returned along with a 400 response code.</p></li></ol>"
+					},
+					"response": [
+						{
+							"name": "Gateway Detach Device: device 10 detached",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8089/gateway/1/detach/10",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8089",
+									"path": [
+										"gateway",
+										"1",
+										"detach",
+										"10"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 23 May 2022 01:55:34 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 1,\n    \"serialNumber\": \"gw0\",\n    \"name\": \"gateway0\",\n    \"ipAddress\": \"10.8.6.50\",\n    \"devices\": [\n        {\n            \"id\": 1,\n            \"uid\": 1,\n            \"vendor\": \"Sony\",\n            \"createdAt\": \"2022-05-23T01:55:05.838+00:00\",\n            \"deviceStatus\": \"ONLINE\"\n        },\n        {\n            \"id\": 2,\n            \"uid\": 2,\n            \"vendor\": \"Apple\",\n            \"createdAt\": \"2022-05-23T01:55:05.838+00:00\",\n            \"deviceStatus\": \"ONLINE\"\n        },\n        {\n            \"id\": 3,\n            \"uid\": 3,\n            \"vendor\": \"Cisco\",\n            \"createdAt\": \"2022-05-23T01:55:05.838+00:00\",\n            \"deviceStatus\": \"ONLINE\"\n        },\n        {\n            \"id\": 4,\n            \"uid\": 4,\n            \"vendor\": \"Huawei\",\n            \"createdAt\": \"2022-05-23T01:55:05.838+00:00\",\n            \"deviceStatus\": \"ONLINE\"\n        },\n        {\n            \"id\": 5,\n            \"uid\": 5,\n            \"vendor\": \"Panasonic\",\n            \"createdAt\": \"2022-05-23T01:55:05.838+00:00\",\n            \"deviceStatus\": \"ONLINE\"\n        },\n        {\n            \"id\": 6,\n            \"uid\": 6,\n            \"vendor\": \"LG\",\n            \"createdAt\": \"2022-05-23T01:55:05.838+00:00\",\n            \"deviceStatus\": \"ONLINE\"\n        },\n        {\n            \"id\": 7,\n            \"uid\": 7,\n            \"vendor\": \"Samsung\",\n            \"createdAt\": \"2022-05-23T01:55:05.838+00:00\",\n            \"deviceStatus\": \"ONLINE\"\n        },\n        {\n            \"id\": 8,\n            \"uid\": 8,\n            \"vendor\": \"Logitech\",\n            \"createdAt\": \"2022-05-23T01:55:05.838+00:00\",\n            \"deviceStatus\": \"ONLINE\"\n        },\n        {\n            \"id\": 9,\n            \"uid\": 9,\n            \"vendor\": \"TP-Link\",\n            \"createdAt\": \"2022-05-23T01:55:05.838+00:00\",\n            \"deviceStatus\": \"ONLINE\"\n        }\n    ]\n}"
+						},
+						{
+							"name": "Gateway Detach Device: detaching unexisting device",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8089/gateway/1/detach/11",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8089",
+									"path": [
+										"gateway",
+										"1",
+										"detach",
+										"11"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 23 May 2022 01:56:09 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"DeviceNotFoundException\": \"The specified device of id: 11 is not attached to the specified gateway\"\n}"
+						},
+						{
+							"name": "Gateway Detach Device: unexisting gateway",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8089/gateway/0/detach/11",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8089",
+									"path": [
+										"gateway",
+										"0",
+										"detach",
+										"11"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 23 May 2022 01:57:19 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"GatewayNotFoundException\": \"Gateway of id: 0 could not be found\"\n}"
+						},
+						{
+							"name": "Gateway Detach Device: unexisting device",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8089/gateway/1/detach/20",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8089",
+									"path": [
+										"gateway",
+										"1",
+										"detach",
+										"20"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 23 May 2022 01:57:52 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"DeviceNotFoundException\": \"Device of id: 20 could not be found\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Delete gateway",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8089/gateway/delete/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8089",
+							"path": [
+								"gateway",
+								"delete",
+								"1"
+							]
+						},
+						"description": "Deletes the specified gateway from the server. This request is successful if the specified gateway exists, in which case it will return a 200 response code. If the specified gateway does not exist a 204 response code will be returned."
+					},
+					"response": [
+						{
+							"name": "Delete gateway",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8089/gateway/delete/1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8089",
+									"path": [
+										"gateway",
+										"delete",
+										"1"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "plain",
+							"header": [
+								{
+									"key": "Content-Length",
+									"value": "0"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 23 May 2022 20:18:04 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": ""
+						},
+						{
+							"name": "Delete gateway: gateway not found",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8089/gateway/delete/1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8089",
+									"path": [
+										"gateway",
+										"delete",
+										"1"
+									]
+								}
+							},
+							"status": "No Content",
+							"code": 204,
+							"_postman_previewlanguage": "plain",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Mon, 23 May 2022 20:19:53 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": ""
+						}
+					]
+				}
+			],
+			"description": "This collections provides examples for managing the gateway resource."
+		},
+		{
+			"name": "Devices",
+			"item": [
+				{
+					"name": "Create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": 15,\n    \"uid\": 40,\n    \"vendor\": \"Qualcom\",\n    \"createdAt\": \"2022-05-21T22:12:41.000+00:00\",\n    \"deviceStatus\": \"ONLINE\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8089/device/create",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8089",
+							"path": [
+								"device",
+								"create"
+							]
+						},
+						"description": "Creates a device resource in the server. This request will be successful and return a 200 response code along with the created resource if:\n\n<ul><li><p>An uid is provided.</p></li><li><p>There is no device with the provided uid.</p></li></ul>\n\nIf the above conditions are not met a 400 response code will be returned along with a Not Valid Device Error.\n\nWhen creating a device it should be taken into account that:\n\n*   If no vendor is provided, a device resource with no vendor will be created.\n*   If no createdAt date is provided a device resource with the current date and time from the server will be created.\n*   If no deviceStatus is specified a device resource with ONLINE status will be created."
+					},
+					"response": [
+						{
+							"name": "Device Create: Successfull",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"uid\":21,\n    \"vendor\": \"Qualcom\",\n    \"createdAt\":\"2022-05-23T22:12:41\",\n    \"deviceStatus\": \"ONLINE\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8089/device/create",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8089",
+									"path": [
+										"device",
+										"create"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 23 May 2022 02:14:16 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 15,\n    \"uid\": 21,\n    \"vendor\": \"Qualcom\",\n    \"createdAt\": \"2022-05-23T22:12:41.000+00:00\",\n    \"deviceStatus\": \"ONLINE\"\n}"
+						}
+					]
+				},
+				{
+					"name": "List devices",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8089/device/list",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8089",
+							"path": [
+								"device",
+								"list"
+							]
+						},
+						"description": "Retrives all devices stored in the server. If at least one device exists list with existing devices will be returned along with a 200 response code. If no device exist a 204 response code will be returned."
+					},
+					"response": [
+						{
+							"name": "List devices",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8089/device/list",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8089",
+									"path": [
+										"device",
+										"list"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 23 May 2022 19:50:20 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"id\": 1,\n        \"uid\": 1,\n        \"vendor\": \"Sony\",\n        \"createdAt\": \"2022-05-23T19:31:53.471+00:00\",\n        \"deviceStatus\": \"ONLINE\"\n    },\n    {\n        \"id\": 2,\n        \"uid\": 2,\n        \"vendor\": \"Apple\",\n        \"createdAt\": \"2022-05-23T19:31:53.480+00:00\",\n        \"deviceStatus\": \"ONLINE\"\n    },\n    {\n        \"id\": 3,\n        \"uid\": 3,\n        \"vendor\": \"Cisco\",\n        \"createdAt\": \"2022-05-23T19:31:53.481+00:00\",\n        \"deviceStatus\": \"ONLINE\"\n    },\n    {\n        \"id\": 4,\n        \"uid\": 4,\n        \"vendor\": \"Huawei\",\n        \"createdAt\": \"2022-05-23T19:31:53.481+00:00\",\n        \"deviceStatus\": \"ONLINE\"\n    },\n    {\n        \"id\": 5,\n        \"uid\": 5,\n        \"vendor\": \"Panasonic\",\n        \"createdAt\": \"2022-05-23T19:31:53.482+00:00\",\n        \"deviceStatus\": \"ONLINE\"\n    },\n    {\n        \"id\": 6,\n        \"uid\": 6,\n        \"vendor\": \"LG\",\n        \"createdAt\": \"2022-05-23T19:31:53.483+00:00\",\n        \"deviceStatus\": \"ONLINE\"\n    },\n    {\n        \"id\": 7,\n        \"uid\": 7,\n        \"vendor\": \"Samsung\",\n        \"createdAt\": \"2022-05-23T19:31:53.484+00:00\",\n        \"deviceStatus\": \"ONLINE\"\n    },\n    {\n        \"id\": 8,\n        \"uid\": 8,\n        \"vendor\": \"Logitech\",\n        \"createdAt\": \"2022-05-23T19:31:53.484+00:00\",\n        \"deviceStatus\": \"ONLINE\"\n    },\n    {\n        \"id\": 9,\n        \"uid\": 9,\n        \"vendor\": \"TP-Link\",\n        \"createdAt\": \"2022-05-23T19:31:53.485+00:00\",\n        \"deviceStatus\": \"ONLINE\"\n    },\n    {\n        \"id\": 10,\n        \"uid\": 10,\n        \"vendor\": \"Hawlett-Packard\",\n        \"createdAt\": \"2022-05-23T19:31:53.486+00:00\",\n        \"deviceStatus\": \"ONLINE\"\n    },\n    {\n        \"id\": 11,\n        \"uid\": 11,\n        \"vendor\": \"IBM\",\n        \"createdAt\": \"2022-05-23T19:31:53.486+00:00\",\n        \"deviceStatus\": \"ONLINE\"\n    },\n    {\n        \"id\": 12,\n        \"uid\": 12,\n        \"vendor\": \"AMD\",\n        \"createdAt\": \"2022-05-23T19:31:53.487+00:00\",\n        \"deviceStatus\": \"ONLINE\"\n    },\n    {\n        \"id\": 13,\n        \"uid\": 13,\n        \"vendor\": \"Intel\",\n        \"createdAt\": \"2022-05-23T19:31:53.488+00:00\",\n        \"deviceStatus\": \"ONLINE\"\n    }\n]"
+						}
+					]
+				},
+				{
+					"name": "View device",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8089/device/view/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8089",
+							"path": [
+								"device",
+								"view",
+								"1"
+							]
+						},
+						"description": "Retrieves the specified device from the server. If the device specified by the path variable exist it will be returned along with a 200 response code. Otherwise, a 204 response code will be returned."
+					},
+					"response": [
+						{
+							"name": "View device",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8089/device/view/2",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8089",
+									"path": [
+										"device",
+										"view",
+										"2"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 23 May 2022 20:24:55 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 2,\n    \"uid\": 2,\n    \"vendor\": \"Apple\",\n    \"createdAt\": \"2022-05-23T20:19:46.082+00:00\",\n    \"deviceStatus\": \"ONLINE\"\n}"
+						},
+						{
+							"name": "View device: device not found",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8089/device/view/0",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8089",
+									"path": [
+										"device",
+										"view",
+										"0"
+									]
+								}
+							},
+							"status": "No Content",
+							"code": 204,
+							"_postman_previewlanguage": "plain",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Mon, 23 May 2022 21:39:46 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": ""
+						}
+					]
+				},
+				{
+					"name": "Update device",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"uid\": 2,\n    \"vendor\": \"updated_Sony\",\n    \"createdAt\": \"2022-05-23T22:12:41.000+00:00\",\n    \"deviceStatus\": \"ONLINE\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8089/device/update/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8089",
+							"path": [
+								"device",
+								"update",
+								"1"
+							]
+						},
+						"description": "Updates the specified device with the information provided. When updating a device it must be considered that:\n\n*   If the the device specified by the path variable does not exist, a Device Not Found error will be returned along with a 400 response code.\n*   If the uid is updated, the provided uid must not assigned to another device, otherwise a Not Valid Device Error will be returned along with a 400 response code.\n*   If no createAt date is provided, the value of the current device will not be modified."
+					},
+					"response": [
+						{
+							"name": "Update device",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"uid\": 1,\n    \"vendor\": \"updated_Sony\",\n    \"createdAt\": \"2022-05-23T22:12:41.000+00:00\",\n    \"deviceStatus\": \"ONLINE\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8089/device/update/1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8089",
+									"path": [
+										"device",
+										"update",
+										"1"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 23 May 2022 19:54:04 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 2,\n    \"uid\": 1,\n    \"vendor\": \"updated_Sony\",\n    \"createdAt\": \"2022-05-23T22:12:41.000+00:00\",\n    \"deviceStatus\": \"ONLINE\"\n}"
+						},
+						{
+							"name": "Update device: Device Not Found",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"uid\": 2,\n    \"vendor\": \"updated_Sony\",\n    \"createdAt\": \"2022-05-23T22:12:41.000+00:00\",\n    \"deviceStatus\": \"ONLINE\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8089/device/update/30",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8089",
+									"path": [
+										"device",
+										"update",
+										"30"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 25 May 2022 03:04:11 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"DeviceNotFoundException\": \"The specified Device with id: 30 could not be modified because it does not exist\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Delete device",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8089/device/delete/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8089",
+							"path": [
+								"device",
+								"delete",
+								"1"
+							]
+						},
+						"description": "Removes the specified device resource from the server. If the device specified by the path variable exist a 200 response code will be returned, otherwise a 204 response code is returned."
+					},
+					"response": [
+						{
+							"name": "Delete device",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8089/device/delete/1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8089",
+									"path": [
+										"device",
+										"delete",
+										"1"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "plain",
+							"header": [
+								{
+									"key": "Content-Length",
+									"value": "0"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 23 May 2022 20:20:55 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": ""
+						},
+						{
+							"name": "Delete device: unexistent device",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8089/device/delete/1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8089",
+									"path": [
+										"device",
+										"delete",
+										"1"
+									]
+								}
+							},
+							"status": "No Content",
+							"code": 204,
+							"_postman_previewlanguage": "plain",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Mon, 23 May 2022 20:21:04 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": ""
+						}
+					]
+				}
+			],
+			"description": "This collection contains examples for managing the device resource."
+		}
+	]
+}

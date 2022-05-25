@@ -17,8 +17,9 @@ public class GatewayValidatorTest {
 
     @BeforeEach
     void initialize() {
-        ValidatorFactory vf = Validation.buildDefaultValidatorFactory();
-        validator = vf.getValidator();
+        try (ValidatorFactory vf = Validation.buildDefaultValidatorFactory()) {
+            validator = vf.getValidator();
+        }
     }
 
     @Test

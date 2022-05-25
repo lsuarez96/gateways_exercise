@@ -101,12 +101,9 @@ public class GatewayService {
      * @param gateway Information to be updated
      * @param id      id of the record to update
      * @return Updated Gateway record
-     * @throws DeviceLimitException     thrown when the amount of devices in the Gateway record exceeds the predefined
-     *                                  amount.
      * @throws GatewayNotFoundException thrown if the specified Gateway record to update does not exist
      */
-    public Gateway updateGateway(Gateway gateway, long id)
-            throws DeviceLimitException, GatewayNotFoundException, NotValidGatewayException {
+    public Gateway updateGateway(Gateway gateway, long id) throws GatewayNotFoundException, NotValidGatewayException {
         Gateway gwRecord = gatewayById(id);
         if (gwRecord != null) {
             if (!gateway.isIPAddressValid()) {
@@ -176,6 +173,7 @@ public class GatewayService {
                     deviceService.updateDevice(device,
                                                deviceId);//Since the device is the owner of the gateway the device
                     // record
+                    gateway.getDevices().add(device);
                 } catch (NotValidDeviceException e) {
                     logger.error(e.getMessage(), e);
                 }
@@ -186,7 +184,8 @@ public class GatewayService {
                         "The amount of devices exceeds the predefined limit of " + maxDevices + " devices");
             }
         }
-        return gatewayById(gatewayId);
+
+        return gateway;
     }
 
     /**
@@ -203,7 +202,7 @@ public class GatewayService {
      */
     public Gateway detachDevice(long gatewayId, long deviceId)
             throws GatewayNotFoundException, DeviceNotFoundException {
-        if(!gatewayRepository.existsById(gatewayId)){
+        if (!gatewayRepository.existsById(gatewayId)) {
             logger.error("Could not detach device due to gateway not found");
             throw new GatewayNotFoundException("Gateway of id: " + gatewayId + " could not be found");
         }

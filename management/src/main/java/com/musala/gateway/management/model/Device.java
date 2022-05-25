@@ -32,8 +32,8 @@ public class Device {
     /**
      * Device is marked as the owning side of the one-to-many relationship
      */
-    @ManyToOne
-    @JoinColumn(name = "gateway_id", nullable = true)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "gateway_id")
     @JsonIgnore
     private Gateway gateway;
 
