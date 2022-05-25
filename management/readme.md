@@ -45,11 +45,13 @@ Max amount of devices that can be associated to a gateway:
 Load test data:
 
     musala.enable.test.data=true
+<H3>Database</H3>
+The service uses H2 in memory database for the proposes of this example. Data is already inserted in the database for the proposes of testing.
 
 <H2>Usage</H2>
     
-The api manages two entities: Gateways and Devices. Request examples are given below.
-
+The api manages two entities: Gateways and Devices. Request examples are given below. A much more comprehensive documentation is offered in the Postman collection located at management/Gateways exercise.postman_collection.json.
+<b>Note:</b>Test data is already included when the service is up. You can disable this behaviour by setting the property musala.enable.test.data=false in the application.properties file.
 <H3>Gateway:</H3>
 <H4>List gateways:</H4>
 <b>Request:</b>
